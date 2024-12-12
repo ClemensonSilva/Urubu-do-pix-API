@@ -1,0 +1,32 @@
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+      - ./app:/app
+  # criando imagem php no arquivo PHP.Dockerfile        
+  php: 
+    build:
+      context: .
+      dockerfile: PHP.Dockerfile
+    volumes:
+      - ./app:/app
+  mysql:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 'miguel30'
+      MYSQL_PASSWORD: 'miguel30'
+      MYSQL_DATABASE: 'urubuDoPix'
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - ./script-sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+volumes:
+  mysqldata: {}
+
+
+
+
