@@ -1,6 +1,6 @@
 <?php
 //var_dump(file_exists('/app/routes/Router.php'));
-
+require "../vendor/autoload.php";
 require_once "/app/controllers/userController.php";
 
 $url = parse_url($_SERVER['REQUEST_URI'])['path'];

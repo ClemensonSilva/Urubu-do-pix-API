@@ -1,5 +1,8 @@
-
 <?php
+namespace app\database;
+
+use PDO;
+use PDOException;
 class Database {
     private $pdo;
     public function __construct() {

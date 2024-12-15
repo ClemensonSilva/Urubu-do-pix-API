@@ -1,5 +1,8 @@
 <?php
-require_once '/app/database/pdo.php';
+namespace app\models;
+use app\database\Database;
+use PDOException;
+
 class UserModel {
     public function createUser(string $user_name){
         $pdo = new Database();

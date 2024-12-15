@@ -1,5 +1,7 @@
 <?php
-require_once "/app/models/userModel.php";
+namespace app\controllers;
+use app\models\UserModel;
+
 class userController {
     public function createUser($input){
         $userModel = new UserModel();
