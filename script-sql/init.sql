@@ -3,8 +3,7 @@ use urubuDoPix;
 
 create table if not exists users(
     id int auto_increment primary key,
-    user_name varchar(35) not null,
-    balance float not null
+    user_name varchar(35) not null
 );
 
 create table if not exists transactions(
