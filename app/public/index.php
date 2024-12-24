@@ -1,30 +1,30 @@
 <?php
-var_dump(file_exists('../vendor/autoload.php'));
-require "../vendor/autoload.php";
-require "/app/routes/routes.php";
+require_once "../vendor/autoload.php";
+require_once "/app/routes/routes.php";
+var_dump(file_exists('../src/database/pdo.php'));
+var_dump(class_exists('App\database\Database'));
 
-use app\public\FunctionHelper\FunctionHelper;
-use app\controllers\userController;
+use App\controllers\userController;
 
-var_dump(FunctionHelper::getUri('path'));
-$method = $_SERVER['REQUEST_METHOD'];
-$input = json_decode(file_get_contents('php://input'),true);
+$obj = new userController();
+$obj->Use();
 
 try {
-   $url = FunctionHelper::getUri('path');
-   $request = FunctionHelper::getMethod();
+   $url = parse_url($_SERVER['REQUEST_URI'])['path'];
+   var_dump($url);
+   $request = $_SERVER['REQUEST_METHOD'];
    if(!isset($router[$request])){
       throw new Exception("A routa não existe");
    }
    if(!array_key_exists($url, $router[$request])){
       throw new Exception("A routa não existe");
    }
-   $controller = $router[$request][$uri];
+   $controller = $router[$request][$url];
    $controller();
 } catch (Exception $e) {
    $e->getMessage();
  }
-switch($method){
+/* switch($method){
    case 'GET':
       echo json_encode(['sucess'=> 'esta funcionando']);
       break;
@@ -33,7 +33,7 @@ switch($method){
       $userController = new userController();
       $userController->createUser($name);
       break;
-}
+} */
 
 
 

@@ -1,7 +1,7 @@
 <?php
-namespace app\database;
-
+namespace App\database;
 use PDO;
+
 use PDOException;
 class Database {
     private $pdo;

@@ -1,17 +1,18 @@
 <?php
-namespace app\models;
-use app\database\Database;
+namespace App\models;
+use App\database\Database;
+require_once '../src/database/pdo.php'; // isso é temporario ate ajustar os namespaces completamente
 use PDOException;
 
 class UserModel {
-    public function createUser(string $user_name){
+    public function createUser( $user_name){ // a variavel user name é do tipo stdClass
         $pdo = new Database();
         $pdo = $pdo->getConnection();
         try {
             if($user_name){
                 $sql = "INSERT INTO users(user_name) VALUES(:user_name)";
                 $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(':user_name', $user_name);
+                $stmt->bindParam(':user_name', $user_name->user_name);
                 $stmt->execute();
                 echo json_encode(['sucess' => 'User created corretly']);
             }
