@@ -7,21 +7,24 @@ use App\database\Database;
 require_once '../src/database/pdo.php'; // isso é temporario ate ajustar os namespaces completamente
 use PDOException;
 use PDO;
+use stdClass;
+
 class UserModel
 {
-    public function createUser($user_name)
-    { // a variavel user name é do tipo stdClass
+    public function createUser( stdClass $userParams)
+    { // a variavel userParams é do tipo stdClass
         $pdo = new Database();
         $pdo = $pdo->getConnection();
         try {
-            if ($user_name) {
-                $sql = "INSERT INTO users(user_name) VALUES(:user_name)";
+            if ($userParams) {
+                $sql = "INSERT INTO users(user_name, user_balance) VALUES(:user_name, :user_balance)";
                 $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(':user_name', $user_name->user_name);
+                $stmt->bindParam(':user_name', $userParams->user_name);
+                $stmt->bindParam(':user_balance', $userParams->user_balance);
                 $stmt->execute();
                 echo json_encode(['sucess' => 'User created corretly']);
             } else {
-                echo json_encode(['error' => 'The user name is mandatory']);
+                echo json_encode(['error' => 'The user name is user_balance']);
             }
         } catch (PDOException $e) {
             echo json_encode(['error' => $e->getMessage()]);
@@ -36,8 +39,12 @@ class UserModel
             $stmt = $pdo->prepare($sql);
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            header('Content-Type: application/json');
-            echo json_encode([  'data'=>$result]);
+            if(!empty($result)){
+                header('Content-Type: application/json');
+                echo json_encode(['data'=>$result]);
+            }else{
+                echo json_encode('Results not found');
+            }
         } catch ( PDOException $e) {
             echo json_encode(['error'=> $e->getMessage()]);
         }
