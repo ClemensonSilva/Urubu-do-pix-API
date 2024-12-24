@@ -24,7 +24,8 @@ function load(string $controller, string $action){
 };
 $router = 
 [
-    'POST' =>[ '/user' => fn() => load('userController', 'createUser') ]
+    'POST' =>[ '/user' => fn() => load('userController', 'createUser') ],
+    'GET' =>['/user'=> fn()=> load('userController', 'getUsers')]
 ]
     
 ?>

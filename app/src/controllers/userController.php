@@ -13,8 +13,10 @@ class userController {
             $userModel->createUser($input);
         }
     }
-    public function Use(){
-        echo json_encode(['sucess'=> 'esta funcionando']);
+    public function getUsers(){
+        $userModel = new UserModel();
+        $userModel->getUsers();
+
     }
 }
 ?>
