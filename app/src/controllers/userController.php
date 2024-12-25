@@ -18,5 +18,9 @@ class userController {
         $userModel->getUsers();
 
     }
+    public function getUserByNameInformation(string $name){
+        $userModel = new UserModel();
+        return $userModel->getUserByNameInformation($name);
+    }
 }
 ?>

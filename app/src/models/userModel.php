@@ -12,7 +12,7 @@ use stdClass;
 class UserModel
 {
     public function createUser( stdClass $userParams)
-    { // a variavel userParams é do tipo stdClass
+    { 
         $pdo = new Database();
         $pdo = $pdo->getConnection();
         try {
@@ -46,6 +46,25 @@ class UserModel
                 echo json_encode('Results not found');
             }
         } catch ( PDOException $e) {
+            echo json_encode(['error'=> $e->getMessage()]);
+        }
+    }
+    public function getUserByName( string $userParams){ // futuramente, talvez seja necessario dividir essa funcao em duas
+        $pdo = new Database();
+        $pdo = $pdo->getConnection();
+//n ha retorno de dados
+        try {
+            $sql = "SELECT * FROM users where user_name= :userParams";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':userParams', $userParams); // vincula o placeholder usado no sql à variável que o corresponde
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC); // recebe os resultados da tabela e os transforma em um array associativo
+            if(!empty($result)){
+                echo json_encode(['data'=>$result]);
+            }else{
+                echo json_encode('Results not found');
+            }
+        } catch (PDOException $e) {
             echo json_encode(['error'=> $e->getMessage()]);
         }
     }
