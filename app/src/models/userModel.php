@@ -49,14 +49,15 @@ class UserModel
             echo json_encode(['error'=> $e->getMessage()]);
         }
     }
-    public function getUserByNameInformation(string $userParams)
+    public function getUserByNameInformation(string|int $userParams)
     { 
         $pdo = new Database();
         $pdo = $pdo->getConnection();
         try {
-            $sql = "SELECT * FROM users where user_name= :userParams";
+            $sql = "SELECT * FROM users where user_name= :userName or  id= :userId ";
             $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(':userParams', $userParams); // vincula o placeholder usado no sql à variável que o corresponde
+            $stmt->bindParam(':userName', $userParams); // vincula o placeholder usado no sql à variável que o corresponde
+            $stmt->bindParam(':userId', $userParams);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC); // recebe os resultados da tabela e os transforma em um array associativo
             if(!empty($result)){
@@ -68,5 +69,6 @@ class UserModel
             echo json_encode(['error'=> $e->getMessage()]);
         }
     }
+    
 }
 ?>
