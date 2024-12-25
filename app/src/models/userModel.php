@@ -1,6 +1,6 @@
 <?php
 
-namespace App\models;
+namespace App\models;   
 
 use App\database\Database;
 
@@ -49,20 +49,20 @@ class UserModel
             echo json_encode(['error'=> $e->getMessage()]);
         }
     }
-    public function getUserByName( string $userParams){ // futuramente, talvez seja necessario dividir essa funcao em duas
+    public function getUserByNameInformation(string $userParams)
+    { 
         $pdo = new Database();
         $pdo = $pdo->getConnection();
-//n ha retorno de dados
         try {
             $sql = "SELECT * FROM users where user_name= :userParams";
             $stmt = $pdo->prepare($sql);
             $stmt->bindParam(':userParams', $userParams); // vincula o placeholder usado no sql à variável que o corresponde
             $stmt->execute();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC); // recebe os resultados da tabela e os transforma em um array associativo
+            $result = $stmt->fetch(PDO::FETCH_ASSOC); // recebe os resultados da tabela e os transforma em um array associativo
             if(!empty($result)){
-                echo json_encode(['data'=>$result]);
+                return json_encode($result);
             }else{
-                echo json_encode('Results not found');
+                return json_encode('Results not found');
             }
         } catch (PDOException $e) {
             echo json_encode(['error'=> $e->getMessage()]);
