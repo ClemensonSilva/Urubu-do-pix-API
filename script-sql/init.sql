@@ -9,8 +9,9 @@ create table if not exists users(
 
 create table if not exists transactions(
     id int auto_increment primary key,
-    userId int,
+    userId int not null,
     depositValue float not null, 
     depositDate date not null, 
+    profitTransaction float,
     FOREIGN KEY (userId) REFERENCES users(id)
 );

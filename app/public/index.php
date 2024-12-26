@@ -3,16 +3,21 @@ require_once "../vendor/autoload.php";
 require_once "/app/routes/routes.php";
 /*
 var_dump(file_exists('../src/database/pdo.php'));
+var_dump(method_exists('App\controllers\userController', 'deposit'));
 */
-var_dump(class_exists('App\controllers\TransactionController'));
 
 use App\models\TransactionModel;
-
+use App\controllers\userController;
+/* 
 $obj = new TransactionModel();
-$a = $obj->setDate();
-echo TransactionModel::setDate();
-var_dump(json_decode($a));
+$obj2 = new userController();
+$obj = new stdClass();
+$obj->user_id=2;
+$obj->deposit= 200;
 
+$b = $obj2->deposit($obj);
+var_dump($obj);
+*/
 
 try {
    $url = parse_url($_SERVER['REQUEST_URI'])['path'];
