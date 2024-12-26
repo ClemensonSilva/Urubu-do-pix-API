@@ -49,7 +49,7 @@ class UserModel
             echo json_encode(['error'=> $e->getMessage()]);
         }
     }
-    public function getUserByNameInformation(string|int $userParams)
+    public function getUserInformation(string|int $userParams)
     { 
         $pdo = new Database();
         $pdo = $pdo->getConnection();
@@ -59,9 +59,9 @@ class UserModel
             $stmt->bindParam(':userName', $userParams); // vincula o placeholder usado no sql à variável que o corresponde
             $stmt->bindParam(':userId', $userParams);
             $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_ASSOC); // recebe os resultados da tabela e os transforma em um array associativo
+            $result = $stmt->fetch(PDO::FETCH_OBJ); // recebe os resultados da tabela e os transforma em um array associativo
             if(!empty($result)){
-                return json_encode($result);
+                return ($result);
             }else{
                 return json_encode('Results not found');
             }

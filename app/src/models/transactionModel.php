@@ -10,10 +10,12 @@ use stdClass;
 class TransactionModel
 {
     public function createTransaction(stdClass $transactionParams){
-        $pdo = new Database();
-        $pdo = $pdo->getConnection();
+      
         // futuramente add codigo para coletar o id do usuario usando nome e email
         try {
+            $pdo = new Database();
+            $pdo = $pdo->getConnection();
+
             if(empty($transactionParams->depositDate)){
                 $transactionParams->depositDate = TransactionModel::setDate();
             }
@@ -22,14 +24,19 @@ class TransactionModel
                 echo json_encode(['error'=> 'The transaction data is mandatory']);
             }
             else{
-                $sql = "INSERT into transactions(userId, depositValue,depositDate) 
-                VALUES(:userId, :depositValue, :depositDate)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(':userId', $transactionParams->user_id);
-                $stmt->bindParam(':depositValue', $transactionParams->depositValue);
-                $stmt->bindParam(':depositDate', $transactionParams->depositDate);
-                $stmt->execute();
-                echo json_encode(['sucess' => 'User created corretly']);
+                if(TransactionModel::userhasBalance($transactionParams->user_id, $transactionParams->depositValue)){
+                    $sql = "INSERT into transactions(userId, depositValue,depositDate) 
+                    VALUES(:userId, :depositValue, :depositDate)";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->bindParam(':userId', $transactionParams->user_id);
+                    $stmt->bindParam(':depositValue', $transactionParams->depositValue);
+                    $stmt->bindParam(':depositDate', $transactionParams->depositDate);
+                    $stmt->execute();
+                    echo json_encode(['sucess' => 'Transaction finished corretlly']);
+                }else{
+                    echo json_encode(['error'=> 'Insuficient Balance']);
+                }
+
             }
         } catch (PDOException $e) {
             echo json_encode(['error' => $e->getMessage()]);
