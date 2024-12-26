@@ -1,7 +1,8 @@
 <?php
 
-namespace App\models;   
+namespace App\models;
 
+use App\controllers\userController;
 use App\database\Database;
 
 require_once '../src/database/pdo.php'; // isso é temporario ate ajustar os namespaces completamente
@@ -24,7 +25,7 @@ class UserModel
                 $stmt->execute();
                 echo json_encode(['sucess' => 'User created corretly']);
             } else {
-                echo json_encode(['error' => 'The user name is user_balance']);
+                echo json_encode(['error'=>true, 'message'=> 'The user name is mandatory']);
             }
         } catch (PDOException $e) {
             echo json_encode(['error' => $e->getMessage()]);
@@ -43,11 +44,39 @@ class UserModel
                 header('Content-Type: application/json');
                 echo json_encode(['data'=>$result]);
             }else{
-                echo json_encode('Results not found');
+                 echo json_encode(['error'=>true, 'message'=> 'Results not found']);      
             }
         } catch ( PDOException $e) {
             echo json_encode(['error'=> $e->getMessage()]);
         }
+    }
+    public function deposit(stdClass $userParams){ // user_id e deposit futuramente usar user_acount
+        try {
+            $pdo = new Database();
+            $pdo = $pdo->getConnection();
+
+            $userController = new userController();
+            $userInfo = $userController->getUserInformation($userParams->user_id);
+            $userName = $userInfo->user_name;
+            if (empty($userName)) { 
+                echo json_encode(['error'=>true, 'message'=> 'Results not found']); 
+                exit();
+            }
+
+            $userBalance = $userInfo->user_balance; // no futuro, sera preciso fazer correcao e adicionar um campo email, que seja como dado unico no DB
+            $newBalance = $userBalance + $userParams->deposit;
+
+            $sql = "UPDATE users set user_balance =:newBalance where user_name=:userName";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':newBalance',  $newBalance);
+            $stmt->bindParam(':userName', $userName);
+            $stmt->execute(); 
+            echo json_encode(['sucess'=>true, 'message'=> 'Deposit made successfully']);      
+
+        }catch ( PDOException $e) {
+            echo json_encode(['error'=> $e->getMessage()]);
+        }
+       
     }
     public function getUserInformation(string|int $userParams)
     { 

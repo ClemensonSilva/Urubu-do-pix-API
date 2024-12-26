@@ -2,6 +2,7 @@
 namespace App\controllers;
 
 use App\models\UserModel;
+use stdClass;
 
 class userController {
     public function createUser($input){
@@ -18,9 +19,13 @@ class userController {
         $userModel->getUsers();
 
     }
-    public function getUserByNameInformation(string $name){
+    public function getUserInformation(string $name):stdClass{
         $userModel = new UserModel();
-        return $userModel->getUserByNameInformation($name);
+        return $userModel->getUserInformation($name);
+    }
+    public function deposit($depositParams)  {
+        $userModel = new UserModel();
+        $userModel->deposit($depositParams);
     }
 }
 ?>
