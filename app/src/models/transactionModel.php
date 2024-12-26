@@ -2,7 +2,7 @@
 namespace App\models;
 
 use App\database\Database;
-
+use App\controllers\userController;
 require_once '../src/database/pdo.php'; // isso é temporario ate ajustar os namespaces completamente
 use PDOException;
 use stdClass;
@@ -34,6 +34,12 @@ class TransactionModel
         } catch (PDOException $e) {
             echo json_encode(['error' => $e->getMessage()]);
         }
+    }
+    public static function userhasBalance(int $user_id, float $depositValue){
+        $userController = new userController();
+        $balance = $userController->getUserInformation($user_id)->user_balance;
+
+        return ($balance > $depositValue)? true : false;
     }
     public static function setDate(){
         return date('y-m-d');
