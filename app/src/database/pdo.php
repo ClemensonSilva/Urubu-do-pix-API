@@ -3,6 +3,8 @@ namespace App\database;
 use PDO;
 
 use PDOException;
+use stdClass;
+
 class Database {
     private $pdo;
     public function __construct() {
@@ -15,6 +17,15 @@ class Database {
     }
     public function getConnection(){
         return $this->pdo;
+    }
+    public static function consultingDB($pdo, $sql, $parametros = []){
+        $stmt = $pdo->prepare($sql);
+
+        foreach ($parametros as $param => $valor) {
+            $stmt->bindParam($param, $valor);
+        }
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }
 return ;
