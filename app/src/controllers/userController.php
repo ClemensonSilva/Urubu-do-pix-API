@@ -5,23 +5,22 @@ use App\models\UserModel;
 use stdClass;
 
 class userController {
-    public function createUser($input){
+    public function createUsers($input){
         $userModel = new UserModel();
         if(empty($input)){
             echo json_encode(['error'=> 'The user name is mandatory']);
         }
         else{
-            $userModel->createUser($input);
+            $userModel->createUsers($input);
         }
     }
     public function getUsers(){
         $userModel = new UserModel();
         $userModel->getUsers();
-
     }
-    public function getUserInformation(string $name):stdClass{
+    public static function getUserInformation(int|string $userParams):stdClass{
         $userModel = new UserModel();
-        return $userModel->getUserInformation($name);
+        return $userModel->getUserInformation($userParams);
     }
     public function deposit($depositParams)  {
         $userModel = new UserModel();

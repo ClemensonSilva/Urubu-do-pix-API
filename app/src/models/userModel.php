@@ -12,7 +12,7 @@ use stdClass;
 
 class UserModel
 {
-    public function createUser( stdClass $userParams)
+    public function createUsers( stdClass $userParams)
     { 
         $pdo = new Database();
         $pdo = $pdo->getConnection();
@@ -23,7 +23,8 @@ class UserModel
                 $stmt->bindParam(':user_name', $userParams->user_name);
                 $stmt->bindParam(':user_balance', $userParams->user_balance);
                 $stmt->execute();
-                echo json_encode(['sucess' => 'User created corretly']);
+                echo json_encode(['sucess'=>true, 'message'=> 'User created corretly']);
+
             } else {
                 echo json_encode(['error'=>true, 'message'=> 'The user name is mandatory']);
             }
@@ -50,13 +51,13 @@ class UserModel
             echo json_encode(['error'=> $e->getMessage()]);
         }
     }
+    // pretendo retirar essa funcao desse modelo e passar para o transactionModel
     public function deposit(stdClass $userParams){ // user_id e deposit futuramente usar user_acount
         try {
             $pdo = new Database();
             $pdo = $pdo->getConnection();
 
-            $userController = new userController();
-            $userInfo = $userController->getUserInformation($userParams->user_id);
+            $userInfo = userController::getUserInformation($userParams->user_id);
             $userName = $userInfo->user_name;
             if (empty($userName)) { 
                 echo json_encode(['error'=>true, 'message'=> 'Results not found']); 
@@ -78,7 +79,7 @@ class UserModel
         }
        
     }
-    public function getUserInformation(string|int $userParams)
+    public  function getUserInformation(string|int $userParams)
     { 
         $pdo = new Database();
         $pdo = $pdo->getConnection();
