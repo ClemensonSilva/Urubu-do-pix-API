@@ -4,7 +4,7 @@ use Exception;
 
 function load(string $controller, string $action){
     try{
-        $controllerFile = "app\\controllers\\{$controller}";
+        $controllerFile = "App\\controllers\\{$controller}";
         if(!class_exists($controllerFile)){
             throw new Exception("O controller: {$controller} não existe.");
         }
@@ -22,9 +22,10 @@ function load(string $controller, string $action){
 };
 $router = 
 [
-    'POST' =>[ '/user' => fn() => load('userController', 'createUser') ],
     'GET' =>['/user'=> fn()=> load('userController', 'getUsers')],
-    'POST' =>['/transaction'=> fn()=> load('TransactionController', 'createTransaction')],
-    'POST' => ['/deposit'=> fn()=> load('userController', 'deposit')]
+    'POST' =>[
+        '/transaction'=> fn()=> load('TransactionController', 'createTransaction'),
+        '/deposit'=> fn()=> load('userController', 'deposit'),
+        '/create/user'=> fn()=>load('userController', 'createUsers')],
 ];
 ?>
