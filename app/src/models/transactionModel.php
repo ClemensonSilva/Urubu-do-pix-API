@@ -5,14 +5,14 @@ namespace App\models;
 use App\database\Database;
 use App\controllers\userController;
 use PDO;
+use DateTime;
 
 require_once '../src/database/pdo.php'; // isso é temporario ate ajustar os namespaces completamente
 use PDOException;
 use stdClass;
-use Transliterator;
 
 class TransactionModel
-{   
+{
     public function createTransaction(stdClass $transactionParams)
     { // user_id e depositValue
 
@@ -36,38 +36,61 @@ class TransactionModel
                 if (TransactionModel::userhasBalance($user_id, $depositValue)) {
                     $pdo->beginTransaction();
                     TransactionModel::addDepositInvestiment($pdo, $user_id, $depositDate, $depositValue);
-                   
+
                     $newBalance = $user_balance - $depositValue;
-                   
-                    TransactionModel::updateUserBalance($pdo,$newBalance,$user_id);
+
+                    TransactionModel::updateUserBalance($pdo, $newBalance, $user_id);
                     $pdo->commit();
                     echo json_encode(['sucess' => 'Transaction finished corretlly']);
                 } else {
-                    $pdo->rollBack();
                     echo json_encode(['error' => 'Insuficient Balance']);
                 }
             }
         } catch (PDOException $e) {
+            $pdo->rollBack();
             echo json_encode(['error' => $e->getMessage()]);
         }
     }
-    
-    public static function  addDepositInvestiment(PDO $pdo,int $user_id,  $depositDate, float $depositValue):void{
+
+
+    public static function profitInvestiment(stdClass $transactionParams)
+    {
+        // user_id, transaction_id, 
+        $transaction_id = $transactionParams->transaction_id;
+        $transactionInfo = TransactionModel::getTransactionInfo($transaction_id);
+        if(is_string($transactionInfo)){
+            return $transactionInfo;
+            exit();
+        }
+        $depositDate =   $transactionInfo->depositDate;
+        $depositValue =   $transactionInfo->depositValue;
+
+        $depositDate = new DateTime($depositDate);
+        $now = new DateTime();
+        $interval = date_diff($depositDate, $now);
+        $days = $interval->days;
+
+        $interest = 0.33;
+
+        $profit = ($depositValue*pow((1 + $interest), $days)) - $depositValue;
+        return $profit;
+    }
+
+
+    public static function  addDepositInvestiment(PDO $pdo, int $user_id,  $depositDate, float $depositValue): void
+    {
         $sql = "INSERT into transactions(userId, depositValue,depositDate) 
         VALUES(:userId, :depositValue, :depositDate)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':userId', $user_id);
-        $stmt->bindParam(':depositValue', $depositValue);
-        $stmt->bindParam(':depositDate', $depositDate);
-        $stmt->execute();
+        Database::consultingDB($pdo, $sql, [
+            ':depositValue' =>  $depositValue,
+            ':depositDate' =>  $depositDate,
+            ':user_id' => $user_id
+        ]);
     }
-    public static function updateUserBalance(PDO $pdo, float $newBalance, int $user_id):void{
+    public static function updateUserBalance(PDO $pdo, float $newBalance, int $user_id): void
+    {
         $sql = "UPDATE users set user_balance =:newBalance where id=:user_id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindParam(':newBalance',  $newBalance);
-        $stmt->bindParam(':user_id', $user_id);
-        $stmt->execute(); 
-
+        Database::consultingDB($pdo, $sql, [':newBalance' =>  $newBalance, ':user_id' => $user_id]);
     }
 
     public static function userhasBalance(int $user_id, float $depositValue)
@@ -78,5 +101,17 @@ class TransactionModel
     public static function setDate()
     {
         return date('y-m-d');
+    }
+
+    public static function getTransactionInfo(int $transaction_id): stdClass|string 
+    {
+        $pdo = new Database();
+        $pdo = $pdo->getConnection();
+        $sql = 'SELECT * FROM transactions where id=:transaction_id';
+        $result = Database::consultingDB($pdo, $sql, [':transaction_id' => $transaction_id]);
+        if(!$result){
+            return json_encode(['error'=>true, 'message'=> 'Transaction not found']);
+        }
+        return $result[0];
     }
 }

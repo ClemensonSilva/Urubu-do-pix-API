@@ -19,13 +19,22 @@ class Database {
         return $this->pdo;
     }
     public static function consultingDB($pdo, $sql, $parametros = []){
-        $stmt = $pdo->prepare($sql);
-
-        foreach ($parametros as $param => $valor) {
-            $stmt->bindParam($param, $valor);
+        try {
+            $stmt = $pdo->prepare($sql);
+    
+            foreach ($parametros as $param => $valor) {
+                $stmt->bindParam($param, $valor);
+            }
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+            if($result!=null){
+                return $result;
+            }else{
+                return false;
+            }
+        } catch (PDOException $e) {
+            return $e->getMessage();
         }
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 }
 return ;

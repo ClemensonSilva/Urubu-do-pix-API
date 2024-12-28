@@ -19,6 +19,7 @@ class UserModel
         try {
             if ($userParams) {
                 $sql = "INSERT INTO users(user_name, user_balance) VALUES(:user_name, :user_balance)";
+
                 $stmt = $pdo->prepare($sql);
                 $stmt->bindParam(':user_name', $userParams->user_name);
                 $stmt->bindParam(':user_balance', $userParams->user_balance);
@@ -34,13 +35,11 @@ class UserModel
     }
     public function getUsers()
     {
-        $pdo = new Database();
-        $pdo = $pdo->getConnection();
         try {
+            $pdo = new Database();
+            $pdo = $pdo->getConnection();
             $sql = "SELECT * FROM users";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $result = Database::consultingDB($pdo, $sql);
             if(!empty($result)){
                 header('Content-Type: application/json');
                 echo json_encode(['data'=>$result]);
