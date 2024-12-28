@@ -9,5 +9,9 @@
             $transaction = new TransactionModel();
             $transaction->createTransaction($transactionParams);
         }
+        public function profitInvestiment($transactionParams){
+            $transaction = new TransactionModel();
+            return $transaction->profitInvestiment($transactionParams);
+        }
     }
 ?>

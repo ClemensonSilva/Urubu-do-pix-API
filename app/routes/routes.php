@@ -25,6 +25,7 @@ $router =
     'GET' =>['/user'=> fn()=> load('userController', 'getUsers')],
     'POST' =>[
         '/transaction'=> fn()=> load('TransactionController', 'createTransaction'),
+        '/transactionInformation'=> fn()=> load('TransactionController', 'profitInvestiment'),
         '/deposit'=> fn()=> load('userController', 'deposit'),
         '/create/user'=> fn()=>load('userController', 'createUsers')],
 ];

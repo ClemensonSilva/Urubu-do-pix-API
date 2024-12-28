@@ -53,15 +53,20 @@ class TransactionModel
     }
 
 
-    public static function profitInvestiment(stdClass $transactionParams)
+    public  function profitInvestiment(stdClass $transactionParams)
     {
         // user_id, transaction_id, 
         $transaction_id = $transactionParams->transaction_id;
         $transactionInfo = TransactionModel::getTransactionInfo($transaction_id);
-        if(is_string($transactionInfo)){
+        $user_id = $transactionParams->user_id;
+        $userInformation = (userController::getUserInformation($user_id));
+        unset($userInformation->user_balance);
+
+        if (is_string($transactionInfo)) {
             return $transactionInfo;
             exit();
         }
+
         $depositDate =   $transactionInfo->depositDate;
         $depositValue =   $transactionInfo->depositValue;
 
@@ -72,8 +77,15 @@ class TransactionModel
 
         $interest = 0.33;
 
-        $profit = ($depositValue*pow((1 + $interest), $days)) - $depositValue;
-        return $profit;
+        $profit = ($depositValue * pow((1 + $interest), $days)) - $depositValue;
+        echo json_encode([
+            "transaction_id" => $transaction_id,
+            "user" => $userInformation,
+            "profit" => $profit,
+            "depositValue" => $depositValue,
+            "interest" => $interest,
+            "depositDate" => $depositDate
+        ]);
     }
 
 
@@ -103,14 +115,14 @@ class TransactionModel
         return date('y-m-d');
     }
 
-    public static function getTransactionInfo(int $transaction_id): stdClass|string 
+    public static function getTransactionInfo(int $transaction_id): stdClass|string
     {
         $pdo = new Database();
         $pdo = $pdo->getConnection();
         $sql = 'SELECT * FROM transactions where id=:transaction_id';
         $result = Database::consultingDB($pdo, $sql, [':transaction_id' => $transaction_id]);
-        if(!$result){
-            return json_encode(['error'=>true, 'message'=> 'Transaction not found']);
+        if (!$result) {
+            return json_encode(['error' => true, 'message' => 'Transaction not found']);
         }
         return $result[0];
     }
