@@ -21,6 +21,10 @@ class ComposerStaticInit0f4fbf3d99d74685738c6b7acbf286c6
     );
 
     public static $classMap = array (
+        'App\\Controllers\\TransactionController' => __DIR__ . '/../..' . '/src/Controllers/TransactionController.php',
+        'App\\Controllers\\UserController' => __DIR__ . '/../..' . '/src/Controllers/UserController.php',
+        'App\\Models\\TransactionModel' => __DIR__ . '/../..' . '/src/Models/TransactionModel.php',
+        'App\\Models\\UserModel' => __DIR__ . '/../..' . '/src/Models/UserModel.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
