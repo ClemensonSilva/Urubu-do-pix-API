@@ -28,19 +28,60 @@ class Databases
     public static function consultingDB($pdo, $sql, $parametros = [])
     {
         try {
+            if (empty($sql)) {
+                echo json_encode([
+                    "error" => true,
+                    "message" => "Erro de SQL",
+                ]);
+                exit();
+            }
+
+            $pdo->beginTransaction();
+
             $stmt = $pdo->prepare($sql);
             foreach ($parametros as $param => $valor) {
                 $stmt->bindParam($param, $valor);
             }
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $pdo->commit();
+
             if ($result != null) {
                 return $result;
             } else {
                 return false;
             }
         } catch (PDOException $e) {
-            echo $e->getMessage();
+            $pdo->rollBack();
+            echo "Database Error" . $e->getMessage();
+            return false;
+        }
+    }
+    public static function operationsInDB($pdo, $sql, $parametros = [])
+    {
+        try {
+            if (empty($sql)) {
+                echo json_encode([
+                    "error" => true,
+                    "message" => "Erro de SQL",
+                ]);
+                exit();
+            }
+
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare($sql);
+            foreach ($parametros as $param => $valor) {
+                $stmt->bindParam($param, $valor);
+            }
+            $result = $stmt->execute();
+
+            $pdo->commit();
+            return true;
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            echo "Database Error" . $e->getMessage();
+            return false;
         }
     }
 }

@@ -83,10 +83,11 @@ class UserModel
 
             $sql =
                 "UPDATE users set user_balance =:newBalance where user_name=:userName";
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(":newBalance", $newBalance);
-            $stmt->bindParam(":userName", $userName);
-            $stmt->execute();
+            Databases::operationsInDB($pdo, $sql, [
+                ":userName" => $userName,
+                ":newBalance" => $newBalance,
+            ]);
+
             echo json_encode([
                 "sucess" => true,
                 "message" => "Deposit made successfully",
