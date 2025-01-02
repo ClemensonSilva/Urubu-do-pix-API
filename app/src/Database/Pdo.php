@@ -36,15 +36,12 @@ class Databases
                 exit();
             }
 
-            $pdo->beginTransaction();
-
             $stmt = $pdo->prepare($sql);
             foreach ($parametros as $param => $valor) {
                 $stmt->bindParam($param, $valor);
             }
             $stmt->execute();
             $result = $stmt->fetchAll(PDO::FETCH_OBJ);
-            $pdo->commit();
 
             if ($result != null) {
                 return $result;
@@ -52,7 +49,6 @@ class Databases
                 return false;
             }
         } catch (PDOException $e) {
-            $pdo->rollBack();
             echo "Database Error" . $e->getMessage();
             return false;
         }
@@ -68,18 +64,14 @@ class Databases
                 exit();
             }
 
-            $pdo->beginTransaction();
-
             $stmt = $pdo->prepare($sql);
             foreach ($parametros as $param => $valor) {
                 $stmt->bindParam($param, $valor);
             }
-            $result = $stmt->execute();
+            $stmt->execute();
 
-            $pdo->commit();
             return true;
         } catch (PDOException $e) {
-            $pdo->rollBack();
             echo "Database Error" . $e->getMessage();
             return false;
         }

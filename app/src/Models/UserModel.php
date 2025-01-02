@@ -66,7 +66,7 @@ class UserModel
             $pdo = new Databases();
             $pdo = $pdo->getConnection();
 
-            $userInfo = userController::getUserInformation(
+            $userInfo = UserController::getUserInformation(
                 $userParams->user_id
             );
             $userName = $userInfo->user_name;
@@ -83,10 +83,11 @@ class UserModel
 
             $sql =
                 "UPDATE users set user_balance =:newBalance where user_name=:userName";
-            Databases::operationsInDB($pdo, $sql, [
-                ":userName" => $userName,
-                ":newBalance" => $newBalance,
-            ]);
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(":userName", $userName);
+            $stmt->bindParam(":newBalance", $newBalance);
+            $result = $stmt->execute();
 
             echo json_encode([
                 "sucess" => true,

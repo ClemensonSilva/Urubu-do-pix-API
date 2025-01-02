@@ -40,7 +40,7 @@ class TransactionModel
                 $depositDate = $transactionParams->depositDate;
             }
 
-            if (is_string(userController::getUserInformation($user_id))) {
+            if (is_string(UserController::getUserInformation($user_id))) {
                 echo json_encode([
                     "error" => true,
                     "message" => "User not found",
@@ -91,7 +91,7 @@ class TransactionModel
             $transaction_id
         );
         $user_id = $transactionParams->user_id;
-        $userInformation = userController::getUserInformation($user_id);
+        $userInformation = UserController::getUserInformation($user_id);
         unset($userInformation->user_balance);
 
         if (is_string($transactionInfo)) {
@@ -151,7 +151,7 @@ class TransactionModel
 
     public static function userhasBalance(int $user_id, float $depositValue)
     {
-        $balance = userController::getUserInformation($user_id)->user_balance;
+        $balance = UserController::getUserInformation($user_id)->user_balance;
         return $balance > $depositValue ? true : false;
     }
     public static function setDate()
