@@ -3,7 +3,7 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use stdClass;
-
+// lembrar de trazer as validacaoes para o controller
 class UserController
 {
     public function createUsers($input)
@@ -12,13 +12,13 @@ class UserController
         if (empty($input)) {
             echo json_encode(["error" => "The user name is mandatory"]);
         } else {
-            $userModel->createUsers($input);
+            echo $userModel->createUsers($input);
         }
     }
     public function getUsers()
     {
         $userModel = new UserModel();
-        $userModel->getUsers();
+        echo $userModel->getUsers();
     }
     public function getUserInvestiments($userParams)
     {
@@ -34,7 +34,7 @@ class UserController
     public function deposit($depositParams)
     {
         $userModel = new UserModel();
-        $userModel->deposit($depositParams);
+        echo $userModel->deposit($depositParams);
     }
 }
 ?>

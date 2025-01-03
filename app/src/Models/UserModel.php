@@ -24,18 +24,18 @@ class UserModel
                     ":user_name" => $userParams->user_name,
                     ":user_balance" => $userParams->user_balance,
                 ]);
-                echo json_encode([
+                return json_encode([
                     "sucess" => true,
                     "message" => "User created corretly",
                 ]);
             } else {
-                echo json_encode([
+                return json_encode([
                     "error" => true,
                     "message" => "The user name is mandatory",
                 ]);
             }
         } catch (PDOException $e) {
-            echo json_encode(["error" => $e->getMessage()]);
+            return json_encode(["error" => $e->getMessage()]);
         }
     }
     public function getUsers()
@@ -47,15 +47,15 @@ class UserModel
             $result = Databases::consultingDB($pdo, $sql);
             if (!empty($result)) {
                 header("Content-Type: application/json");
-                echo json_encode(["data" => $result]);
+                return json_encode(["data" => $result]);
             } else {
-                echo json_encode([
+                return json_encode([
                     "error" => true,
                     "message" => "Results not found",
                 ]);
             }
         } catch (PDOException $e) {
-            echo json_encode(["error" => $e->getMessage()]);
+            return json_encode(["error" => $e->getMessage()]);
         }
     }
 
@@ -66,9 +66,9 @@ class UserModel
         $pdo = $pdo->getConnection();
         // user_id
         if (empty($userParams->user_id)) {
-            echo json_encode([
+            return json_encode([
                 "error" => true,
-                "message" => "This user doesn´t exists",
+                "message" => "You have to insert a user id.",
             ]);
             exit();
         }
@@ -80,6 +80,9 @@ class UserModel
         $results = Databases::consultingDB($pdo, $sql, [
             ":user_id" => $user_id,
         ]);
+        if (empty($results)) {
+            return Databases::resultsNotFound("User Transactions");
+        }
         $arrayOfResults = [];
         foreach ($results as $result) {
             $stdObjbect->user_id = $user_id;
@@ -105,11 +108,7 @@ class UserModel
             );
             $userName = $userInfo->user_name;
             if (empty($userName)) {
-                echo json_encode([
-                    "error" => true,
-                    "message" => "Results not found",
-                ]);
-                exit();
+                return Databases::resultsNotFound("User");
             }
 
             $userBalance = $userInfo->user_balance; // no futuro, sera preciso fazer correcao e adicionar um campo email, que seja como dado unico no DB
@@ -122,12 +121,12 @@ class UserModel
                 ":newBalance" => $newBalance,
             ]);
 
-            echo json_encode([
+            return json_encode([
                 "sucess" => true,
                 "message" => "Deposit made successfully",
             ]);
         } catch (PDOException $e) {
-            echo json_encode(["error" => $e->getMessage()]);
+            return json_encode(["error" => $e->getMessage()]);
         }
     }
     public function getUserInformation(string|int $userParams)
@@ -148,7 +147,7 @@ class UserModel
                 return json_encode("Results not found");
             }
         } catch (PDOException $e) {
-            echo json_encode(["error" => $e->getMessage()]);
+            return json_encode(["error" => $e->getMessage()]);
         }
     }
 }

@@ -67,12 +67,12 @@ class TransactionModel
                     $user_id
                 );
                 $pdo->commit();
-                echo json_encode([
+                return json_encode([
                     "sucess" => true,
                     "message" => "Transaction made sucessfuly",
                 ]);
             } else {
-                echo json_encode([
+                return json_encode([
                     "error" => true,
                     "message" => "Insuficient Balance",
                 ]);
@@ -80,7 +80,7 @@ class TransactionModel
             }
         } catch (PDOException $e) {
             $pdo->rollBack();
-            echo json_encode(["error" => $e->getMessage()]);
+            return json_encode(["error" => $e->getMessage()]);
         }
     }
     public static function profitInvestiment(stdClass $transactionParams)
@@ -95,7 +95,7 @@ class TransactionModel
         unset($userInformation->user_balance);
 
         if (is_string($transactionInfo)) {
-            echo $transactionInfo;
+            return $transactionInfo;
             exit();
         }
         $depositDate = $transactionInfo->depositDate;

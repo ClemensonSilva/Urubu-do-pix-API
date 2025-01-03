@@ -76,6 +76,13 @@ class Databases
             return false;
         }
     }
+    public static function resultsNotFound(string $variableOfSearch)
+    {
+        return [
+            "error" => true,
+            "message" => $variableOfSearch . " not found.",
+        ];
+    }
 }
 return;
 ?>

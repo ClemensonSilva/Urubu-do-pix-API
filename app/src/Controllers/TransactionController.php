@@ -8,7 +8,7 @@ class TransactionController
     public function createTransaction($transactionParams)
     {
         $transaction = new TransactionModel();
-        $transaction->createTransaction($transactionParams);
+        echo $transaction->createTransaction($transactionParams);
     }
     public static function profitInvestiment($transactionParams)
     {
