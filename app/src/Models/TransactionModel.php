@@ -35,7 +35,7 @@ class TransactionModel
             (float) ($depositValue = $transactionParams->depositValue);
 
             if (empty($transactionParams->depositDate)) {
-                $transactionParams->depositDate = TransactionModel::setDate();
+                $depositDate = $transactionParams->depositDate = TransactionModel::setDate();
             } else {
                 $depositDate = $transactionParams->depositDate;
             }
@@ -89,34 +89,35 @@ class TransactionModel
         $transaction_id = $transactionParams->transaction_id;
         $transactionInfo = TransactionModel::getTransactionInfo(
             $transaction_id
-        );
+        ); // retorna uma string se nada for encontrado com msg de erro
         $user_id = $transactionParams->user_id;
-        $userInformation = userController::getUserInformation($user_id);
+        $userInformation = UserController::getUserInformation($user_id);
         unset($userInformation->user_balance);
 
         if (is_string($transactionInfo)) {
             echo $transactionInfo;
             exit();
         }
-
         $depositDate = $transactionInfo->depositDate;
         $depositValue = $transactionInfo->depositValue;
 
         $depositDate = new DateTime($depositDate);
         $now = new DateTime();
         $interval = date_diff($depositDate, $now);
-        $days = $interval->days;
+        $days = round($interval->days / 30, 1);
 
         $interest = 0.33;
 
-        $profit = $depositValue * pow(1 + $interest, $days) - $depositValue;
-
+        $profit = round(
+            $depositValue * pow(1 + $interest, $days) - $depositValue,
+            5
+        ); // filtro para impedir que valor chegue ao infinto no PHP
         echo json_encode([
             "transaction_id" => $transaction_id,
             "user" => $userInformation,
             "profit" => $profit,
             "depositValue" => $depositValue,
-            "interest" => $interest,
+            "interest" => $interest . " per months",
             "depositDate" => $depositDate,
         ]);
     }
