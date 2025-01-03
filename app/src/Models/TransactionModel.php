@@ -83,7 +83,7 @@ class TransactionModel
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
-    public function profitInvestiment(stdClass $transactionParams)
+    public static function profitInvestiment(stdClass $transactionParams)
     {
         // user_id, transaction_id,
         $transaction_id = $transactionParams->transaction_id;
@@ -112,14 +112,14 @@ class TransactionModel
             $depositValue * pow(1 + $interest, $days) - $depositValue,
             5
         ); // filtro para impedir que valor chegue ao infinto no PHP
-        echo json_encode([
+        return [
             "transaction_id" => $transaction_id,
             "user" => $userInformation,
             "profit" => $profit,
             "depositValue" => $depositValue,
             "interest" => $interest . " per months",
             "depositDate" => $depositDate,
-        ]);
+        ];
     }
 
     public static function addDepositInvestiment(

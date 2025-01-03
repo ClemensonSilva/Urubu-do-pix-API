@@ -6,7 +6,7 @@ var_dump(method_exists("App\Models\UserModel", "getUsers"));
  */
 
 use App\Models\TransactionModel;
-use App\controllers\userController;
+use App\Controllers\UserController;
 /*
 $obj2 = new userController();
 $obj = new stdClass();
@@ -21,6 +21,10 @@ $obj = new stdClass();
 $obj->user_id = 2;
 $obj->depositValue = 16;
 $obj2->createTransaction($obj);
+$obj2 = new UserController();
+$obj = new stdClass();
+$obj->user_id = 2;
+$obj2->getUserInvestiments($obj);
 */
 
 try {

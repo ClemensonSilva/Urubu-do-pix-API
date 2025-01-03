@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Controllers\TransactionController;
 use App\Controllers\UserController;
 use App\Database\Databases;
 
@@ -57,7 +58,41 @@ class UserModel
             echo json_encode(["error" => $e->getMessage()]);
         }
     }
-    // pretendo retirar essa funcao desse modelo e passar para o transactionModel
+
+    public function getUserInvestiments(stdClass $userParams)
+    {
+        $pdo = new Databases();
+        $stdObjbect = new stdClass();
+        $pdo = $pdo->getConnection();
+        // user_id
+        if (empty($userParams->user_id)) {
+            echo json_encode([
+                "error" => true,
+                "message" => "This user doesn´t exists",
+            ]);
+            exit();
+        }
+
+        $user_id = $userParams->user_id;
+
+        // consultar DB e verificar as transactions que existem para esse usuario
+        $sql = "SELECT * FROM transactions WHERE userId=:user_id";
+        $results = Databases::consultingDB($pdo, $sql, [
+            ":user_id" => $user_id,
+        ]);
+        $arrayOfResults = [];
+        foreach ($results as $result) {
+            $stdObjbect->user_id = $user_id;
+            $stdObjbect->transaction_id = $result->id;
+            $result = TransactionModel::profitInvestiment($stdObjbect);
+            $name = $result["user"]->user_name;
+            unset($result["user"]);
+            array_push($arrayOfResults, $result);
+        }
+        array_unshift($arrayOfResults, $name);
+        return $arrayOfResults;
+    }
+
     public function deposit(stdClass $userParams)
     {
         // user_id e deposit futuramente usar user_acount

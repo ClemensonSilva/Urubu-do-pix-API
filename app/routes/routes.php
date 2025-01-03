@@ -35,6 +35,10 @@ $router = [
         ),
         "/deposit" => fn() => load("UserController", "deposit"),
         "/create/user" => fn() => load("UserController", "createUsers"),
+        "/user/investiments" => fn() => load(
+            "UserController",
+            "getUserInvestiments"
+        ),
     ],
 ];
 ?>

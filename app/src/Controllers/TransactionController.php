@@ -10,10 +10,11 @@ class TransactionController
         $transaction = new TransactionModel();
         $transaction->createTransaction($transactionParams);
     }
-    public function profitInvestiment($transactionParams)
+    public static function profitInvestiment($transactionParams)
     {
-        $transaction = new TransactionModel();
-        return $transaction->profitInvestiment($transactionParams);
+        echo json_encode(
+            TransactionModel::profitInvestiment($transactionParams)
+        );
     }
 }
 ?>

@@ -20,6 +20,11 @@ class UserController
         $userModel = new UserModel();
         $userModel->getUsers();
     }
+    public function getUserInvestiments($userParams)
+    {
+        $userModel = new UserModel();
+        echo json_encode($userModel->getUserInvestiments($userParams));
+    }
     public static function getUserInformation(
         int|string $userParams
     ): stdClass|string {
