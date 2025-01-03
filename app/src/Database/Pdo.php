@@ -66,7 +66,7 @@ class Databases
 
             $stmt = $pdo->prepare($sql);
             foreach ($parametros as $param => $valor) {
-                $stmt->bindParam($param, $valor);
+                $stmt->bindValue($param, $valor);
             }
             $stmt->execute();
 

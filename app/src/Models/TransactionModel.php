@@ -91,7 +91,7 @@ class TransactionModel
             $transaction_id
         );
         $user_id = $transactionParams->user_id;
-        $userInformation = UserController::getUserInformation($user_id);
+        $userInformation = userController::getUserInformation($user_id);
         unset($userInformation->user_balance);
 
         if (is_string($transactionInfo)) {
@@ -129,12 +129,11 @@ class TransactionModel
     ): void {
         $sql = "INSERT into transactions(userId, depositValue, depositDate)
                            VALUES(:userId, :depositValue, :depositDate)";
-        $stmt = $pdo->prepare($sql);
-
-        $stmt->bindParam(":userId", $user_id, PDO::PARAM_INT);
-        $stmt->bindParam(":depositValue", $depositValue);
-        $stmt->bindParam(":depositDate", $depositDate);
-        $stmt->execute();
+        Databases::operationsInDB($pdo, $sql, [
+            ":userId" => $user_id,
+            ":depositValue" => $depositValue,
+            ":depositDate" => $depositDate,
+        ]);
     }
     public static function updateUserBalance(
         PDO $pdo,
@@ -143,15 +142,15 @@ class TransactionModel
     ): void {
         $sql = "UPDATE users set user_balance = :newBalance where id= :user_id";
         $stmt = $pdo->prepare($sql);
-
-        $stmt->bindParam(":newBalance", $newBalance, PDO::PARAM_INT);
-        $stmt->bindParam(":user_id", $user_id);
-        $stmt->execute();
+        Databases::operationsInDB($pdo, $sql, [
+            ":newBalance" => $newBalance,
+            ":user_id" => $user_id,
+        ]);
     }
 
     public static function userhasBalance(int $user_id, float $depositValue)
     {
-        $balance = UserController::getUserInformation($user_id)->user_balance;
+        $balance = userController::getUserInformation($user_id)->user_balance;
         return $balance > $depositValue ? true : false;
     }
     public static function setDate()
@@ -174,6 +173,6 @@ class TransactionModel
                 "message" => "Transaction not found",
             ]);
         }
-        return $result[0];
+        return $result[0]; // o fetchAll da f consultingDB retorna um array e eu quero capturar apenas o primeiro
     }
 }

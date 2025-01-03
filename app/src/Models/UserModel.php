@@ -19,11 +19,10 @@ class UserModel
             if ($userParams) {
                 $sql =
                     "INSERT INTO users(user_name, user_balance) VALUES(:user_name, :user_balance)";
-
-                $stmt = $pdo->prepare($sql);
-                $stmt->bindParam(":user_name", $userParams->user_name);
-                $stmt->bindParam(":user_balance", $userParams->user_balance);
-                $stmt->execute();
+                Databases::operationsInDB($pdo, $sql, [
+                    ":user_name" => $userParams->user_name,
+                    ":user_balance" => $userParams->user_balance,
+                ]);
                 echo json_encode([
                     "sucess" => true,
                     "message" => "User created corretly",
@@ -83,11 +82,10 @@ class UserModel
 
             $sql =
                 "UPDATE users set user_balance =:newBalance where user_name=:userName";
-
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(":userName", $userName);
-            $stmt->bindParam(":newBalance", $newBalance);
-            $result = $stmt->execute();
+            Databases::operationsInDB($pdo, $sql, [
+                ":userName" => $userName,
+                ":newBalance" => $newBalance,
+            ]);
 
             echo json_encode([
                 "sucess" => true,
@@ -104,13 +102,13 @@ class UserModel
         try {
             $sql =
                 "SELECT * FROM users where user_name= :userName or  id= :userId ";
-            $stmt = $pdo->prepare($sql);
-            $stmt->bindParam(":userName", $userParams); // vincula o placeholder usado no sql à variável que o corresponde
-            $stmt->bindParam(":userId", $userParams);
-            $stmt->execute();
-            $result = $stmt->fetch(PDO::FETCH_OBJ); // recebe os resultados da tabela e os transforma em um array associativo
+            $result = Databases::consultingDB($pdo, $sql, [
+                ":userName" => $userParams,
+                ":userId" => $userParams,
+            ]);
+            // recebe os resultados da tabela e os transforma em um array associativo
             if (!empty($result)) {
-                return $result;
+                return $result[0]; // a funcao consultingDB retorna um array, mas quero coletar o primeiro e unico objeto contido neste array
             } else {
                 return json_encode("Results not found");
             }
