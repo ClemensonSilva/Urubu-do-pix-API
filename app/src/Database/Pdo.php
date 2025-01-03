@@ -83,6 +83,13 @@ class Databases
             "message" => $variableOfSearch . " not found.",
         ];
     }
+    public static function genericMessage(string $status, $message)
+    {
+        return [
+            $status => true,
+            "message" => $message,
+        ];
+    }
 }
 return;
 ?>

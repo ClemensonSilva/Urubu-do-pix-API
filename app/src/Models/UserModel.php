@@ -24,18 +24,18 @@ class UserModel
                     ":user_name" => $userParams->user_name,
                     ":user_balance" => $userParams->user_balance,
                 ]);
-                return json_encode([
-                    "sucess" => true,
-                    "message" => "User created corretly",
-                ]);
+                return Databases::genericMessage(
+                    "sucess",
+                    "User created corretly"
+                );
             } else {
-                return json_encode([
-                    "error" => true,
-                    "message" => "The user name is mandatory",
-                ]);
+                return Databases::genericMessage(
+                    "error",
+                    "The user name is mandatory"
+                );
             }
         } catch (PDOException $e) {
-            return json_encode(["error" => $e->getMessage()]);
+            return Databases::genericMessage("error", $e->getMessage());
         }
     }
     public function getUsers()
@@ -47,15 +47,12 @@ class UserModel
             $result = Databases::consultingDB($pdo, $sql);
             if (!empty($result)) {
                 header("Content-Type: application/json");
-                return json_encode(["data" => $result]);
+                return ["data" => $result];
             } else {
-                return json_encode([
-                    "error" => true,
-                    "message" => "Results not found",
-                ]);
+                return Databases::resultsNotFound("Results");
             }
         } catch (PDOException $e) {
-            return json_encode(["error" => $e->getMessage()]);
+            return Databases::genericMessage("error", $e->getMessage());
         }
     }
 
@@ -66,11 +63,10 @@ class UserModel
         $pdo = $pdo->getConnection();
         // user_id
         if (empty($userParams->user_id)) {
-            return json_encode([
-                "error" => true,
-                "message" => "You have to insert a user id.",
-            ]);
-            exit();
+            return Databases::genericMessage(
+                "error",
+                "You have to insert a user id."
+            );
         }
 
         $user_id = $userParams->user_id;
@@ -121,12 +117,12 @@ class UserModel
                 ":newBalance" => $newBalance,
             ]);
 
-            return json_encode([
-                "sucess" => true,
-                "message" => "Deposit made successfully",
-            ]);
+            return Databases::genericMessage(
+                "sucess",
+                "Deposit made successfully"
+            );
         } catch (PDOException $e) {
-            return json_encode(["error" => $e->getMessage()]);
+            return Databases::genericMessage("error", $e->getMessage());
         }
     }
     public function getUserInformation(string|int $userParams)
@@ -144,10 +140,10 @@ class UserModel
             if (!empty($result)) {
                 return $result[0]; // a funcao consultingDB retorna um array, mas quero coletar o primeiro e unico objeto contido neste array
             } else {
-                return json_encode("Results not found");
+                return Databases::resultsNotFound("User");
             }
         } catch (PDOException $e) {
-            return json_encode(["error" => $e->getMessage()]);
+            return Databases::genericMessage("error", $e->getMessage());
         }
     }
 }

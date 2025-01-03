@@ -25,10 +25,10 @@ class TransactionModel
                 empty($transactionParams->depositValue) ||
                 empty($transactionParams->user_id)
             ) {
-                echo json_encode([
-                    "error" => "The transaction data is mandatory",
-                ]);
-                exit();
+                return Databases::genericMessage(
+                    "error",
+                    "The transaction data is mandatory."
+                );
             }
 
             (int) ($user_id = $transactionParams->user_id);
@@ -41,11 +41,7 @@ class TransactionModel
             }
 
             if (is_string(UserController::getUserInformation($user_id))) {
-                echo json_encode([
-                    "error" => true,
-                    "message" => "User not found",
-                ]);
-                exit();
+                return Databases::resultsNotFound("User");
             }
             $user_balance = UserController::getUserInformation($user_id)
                 ->user_balance;
@@ -67,20 +63,20 @@ class TransactionModel
                     $user_id
                 );
                 $pdo->commit();
-                return json_encode([
-                    "sucess" => true,
-                    "message" => "Transaction made sucessfuly",
-                ]);
+                return Databases::genericMessage(
+                    "sucess",
+                    "Transaction made sucessfuly"
+                );
             } else {
-                return json_encode([
-                    "error" => true,
-                    "message" => "Insuficient Balance",
-                ]);
                 $pdo->rollBack();
+                return Databases::genericMessage(
+                    "error",
+                    "Insuficient Balance"
+                );
             }
         } catch (PDOException $e) {
             $pdo->rollBack();
-            return json_encode(["error" => $e->getMessage()]);
+            return Databases::genericMessage("error", $e->getMessage());
         }
     }
     public static function profitInvestiment(stdClass $transactionParams)
@@ -169,10 +165,7 @@ class TransactionModel
             ":transaction_id" => $transaction_id,
         ]);
         if (!$result) {
-            return json_encode([
-                "error" => true,
-                "message" => "Transaction not found",
-            ]);
+            return Databases::resultsNotFound("Transactions ");
         }
         return $result[0]; // o fetchAll da f consultingDB retorna um array e eu quero capturar apenas o primeiro
     }
