@@ -61,13 +61,6 @@ class UserModel
         $pdo = new Databases();
         $stdObjbect = new stdClass();
         $pdo = $pdo->getConnection();
-        // user_id
-        if (empty($userParams->user_id)) {
-            return Databases::genericMessage(
-                "error",
-                "You have to insert a user id."
-            );
-        }
 
         $user_id = $userParams->user_id;
 

@@ -78,6 +78,7 @@ class Databases
     }
     public static function resultsNotFound(string $variableOfSearch)
     {
+        header("Content-Type: application/json");
         return [
             "error" => true,
             "message" => $variableOfSearch . " not found.",
@@ -85,6 +86,7 @@ class Databases
     }
     public static function genericMessage(string $status, $message)
     {
+        header("Content-Type: application/json");
         return [
             $status => true,
             "message" => $message,

@@ -10,6 +10,7 @@ require_once "../src/Database/Pdo.php"; // isso é temporario ate ajustar os nam
 use PDOException;
 use stdClass;
 
+// CRIAR REGRAS DE NEGOCIO MAIS ESPECIFICAS
 class TransactionModel
 {
     public function createTransaction(stdClass $transactionParams)
@@ -20,16 +21,6 @@ class TransactionModel
         try {
             $pdo = new Databases();
             $pdo = $pdo->getConnection();
-
-            if (
-                empty($transactionParams->depositValue) ||
-                empty($transactionParams->user_id)
-            ) {
-                return Databases::genericMessage(
-                    "error",
-                    "The transaction data is mandatory."
-                );
-            }
 
             (int) ($user_id = $transactionParams->user_id);
             (float) ($depositValue = $transactionParams->depositValue);
@@ -79,6 +70,7 @@ class TransactionModel
             return Databases::genericMessage("error", $e->getMessage());
         }
     }
+
     public static function profitInvestiment(stdClass $transactionParams)
     {
         // user_id, transaction_id,
