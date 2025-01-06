@@ -134,14 +134,18 @@ class TransactionModel
         }
         try {
             $pdo->beginTransaction();
-            $sql =
-                "UPDATE transactions set depositValue=:new_value, percentageWithdrawn=:percentageofWithdrawn where userId=:user_id and id=:transaction_id";
-            Databases::operationsInDB($pdo, $sql, [
-                ":user_id" => $user_id,
-                ":new_value" => $newValueofInvestiment,
-                ":percentageofWithdrawn" => $percentageofWithdrawn,
-                ":transaction_id" => $transaction_id,
-            ]);
+            TransactionModel::updateTransactionValue(
+                $pdo,
+                $user_id,
+                $newValueofInvestiment,
+                $transaction_id
+            );
+            TransactionModel::updateWithdrawPercentage(
+                $pdo,
+                $user_id,
+                $percentageofWithdrawn,
+                $transaction_id
+            );
             $newValueofUserAcount = $valueToWithdraw + $user->user_balance;
             TransactionModel::updateUserBalance(
                 $pdo,
@@ -149,12 +153,14 @@ class TransactionModel
                 $user_id
             );
             $pdo->commit();
+            return Databases::genericMessage(
+                "sucess",
+                "Withdraw made sucessfully"
+            );
         } catch (PDOException $e) {
             $pdo->rollBack();
             return Databases::genericMessage("error", $e->getMessage());
         }
-
-        return Databases::genericMessage("sucess", "Withdraw made sucessfully");
 
         // nao permitir que um valor maior que 20% do valor investido seja retirado por withdraw
 
@@ -203,7 +209,34 @@ class TransactionModel
             "depositDate" => $depositDate,
         ];
     }
-
+    public static function updateTransactionValue(
+        $pdo,
+        $user_id,
+        $newValueofInvestiment,
+        $transaction_id
+    ) {
+        $sql = "UPDATE transactions set depositValue=:new_value
+             where userId=:user_id and id=:transaction_id";
+        Databases::operationsInDB($pdo, $sql, [
+            ":user_id" => $user_id,
+            ":new_value" => $newValueofInvestiment,
+            ":transaction_id" => $transaction_id,
+        ]);
+    }
+    public static function updateWithdrawPercentage(
+        $pdo,
+        $user_id,
+        $percentageofWithdrawn,
+        $transaction_id
+    ) {
+        $sql =
+            "UPDATE transactions set  percentageWithdrawn=:percentageofWithdrawn where userId=:user_id and id=:transaction_id";
+        Databases::operationsInDB($pdo, $sql, [
+            ":user_id" => $user_id,
+            ":percentageofWithdrawn" => $percentageofWithdrawn,
+            ":transaction_id" => $transaction_id,
+        ]);
+    }
     public static function addDepositInvestiment(
         PDO $pdo,
         int $user_id,
