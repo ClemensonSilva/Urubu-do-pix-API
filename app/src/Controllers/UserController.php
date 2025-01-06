@@ -4,7 +4,6 @@ namespace App\Controllers;
 use App\Database\Databases;
 use App\Models\UserModel;
 use stdClass;
-// lembrar de trazer as validacaoes para o controller
 require_once "../src/Database/Pdo.php";
 class UserController
 {

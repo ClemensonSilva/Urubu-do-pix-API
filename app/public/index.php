@@ -8,23 +8,13 @@ var_dump(method_exists("App\Models\UserModel", "getUsers"));
 use App\Models\TransactionModel;
 use App\Controllers\UserController;
 /*
-$obj2 = new userController();
-$obj = new stdClass();
-$obj->user_id=2;
-$obj->deposit= 200;
 
-$b = $obj2->deposit($obj);
-var_dump($obj);
-var_dump(TransactionModel:  :getTransactionInfo(1));
-$obj2 = new TransactionModel();
-$obj = new stdClass();
-$obj->user_id = 2;
-$obj->depositValue = 16;
-$obj2->createTransaction($obj);
-$obj2 = new UserController();
-$obj = new stdClass();
-$obj->user_id = 2;
-$obj2->getUserInvestiments($obj);
+var_dump(TransactionModel::getTransactionInfo(20));
+$transaction = new stdClass();
+$transaction->user_id = 1;
+$transaction->transaction_id = 2;
+$transaction->valueToWithdraw = 2;
+var_dump(TransactionModel::withdraw($transaction));
 */
 
 try {

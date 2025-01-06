@@ -25,6 +25,24 @@ class TransactionController
         $transaction = new TransactionModel();
         echo json_encode($transaction->createTransaction($transactionParams));
     }
+    public function withdraw($transactionParams)
+    {
+        if (
+            empty($transactionParams->transaction_id) ||
+            empty($transactionParams->user_id) ||
+            empty($transactionParams->valueToWithdraw)
+        ) {
+            echo json_encode(
+                Databases::genericMessage(
+                    "error",
+                    "The transaction data like transaction_id, user id and valueToWithdraw is mandatory."
+                )
+            );
+            return 0;
+        }
+        echo json_encode(TransactionModel::withdraw($transactionParams));
+    }
+    // criar funcao de sacar lucro dos investimentos e lembrar de pôr nele a regra de negocio
     public static function profitInvestiment($transactionParams)
     {
         if (
@@ -39,9 +57,13 @@ class TransactionController
             );
             return 0;
         }
-        echo json_encode(
-            TransactionModel::profitInvestiment($transactionParams)
-        );
+        // trata saidas do tipo string e do tipo array
+        $result = TransactionModel::profitInvestiment($transactionParams);
+        if (is_string($result)) {
+            echo $result;
+        } else {
+            echo json_encode($result);
+        }
     }
 }
 ?>

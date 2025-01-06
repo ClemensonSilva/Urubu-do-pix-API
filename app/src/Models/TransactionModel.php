@@ -70,22 +70,114 @@ class TransactionModel
             return Databases::genericMessage("error", $e->getMessage());
         }
     }
-
-    public static function profitInvestiment(stdClass $transactionParams)
+    public static function withdraw($transactionParams)
     {
-        // user_id, transaction_id,
+        $pdo = new Databases();
+        $pdo = $pdo->getConnection();
+
+        // user_id, transaction_id, valueToWithdraw
+        $user_id = $transactionParams->user_id;
         $transaction_id = $transactionParams->transaction_id;
+        $valueToWithdraw = $transactionParams->valueToWithdraw;
+
         $transactionInfo = TransactionModel::getTransactionInfo(
             $transaction_id
-        ); // retorna uma string se nada for encontrado com msg de erro
-        $user_id = $transactionParams->user_id;
-        $userInformation = UserController::getUserInformation($user_id);
-        unset($userInformation->user_balance);
+        );
 
         if (is_string($transactionInfo)) {
             return $transactionInfo;
             exit();
         }
+
+        $user = UserController::getUserInformation($user_id);
+
+        if (is_string($user)) {
+            return $user;
+            exit();
+        }
+        if ($user_id !== $transactionInfo->userId) {
+            return Databases::genericMessage(
+                "error",
+                "Something is wrong... verifie user Id or transaction Id if its corrects."
+            );
+        }
+
+        $valueInvested = $transactionInfo->depositValue;
+        if ($valueInvested < $valueToWithdraw) {
+            return Databases::genericMessage(
+                "error",
+                "The withdrawal amount is greater than the invested amount"
+            );
+        }
+        $alloweWithdraw = 0.5 * $valueInvested;
+
+        if ($valueToWithdraw > $alloweWithdraw) {
+            return Databases::genericMessage(
+                "error",
+                "The withdrawal amount is greater than the allowed amount for the transaction. Your limit is now {$alloweWithdraw}"
+            );
+        }
+        $newValueofInvestiment = $valueInvested - $valueToWithdraw;
+        $percentageAlreadyWithdrawn = $transactionInfo->percentageWithdrawn;
+        if (empty($percentageAlreadyWithdrawn)) {
+            $percentageAlreadyWithdrawn = 0;
+        }
+        $percentageofWithdrawn =
+            $percentageAlreadyWithdrawn + $valueToWithdraw / $valueInvested;
+
+        if ($percentageofWithdrawn > 0.65) {
+            return Databases::genericMessage(
+                "error",
+                "At this moment we are having trouble processing your withdrawal. Please wait a moment and try again later"
+            );
+            exit();
+        }
+        try {
+            $pdo->beginTransaction();
+            $sql =
+                "UPDATE transactions set depositValue=:new_value, percentageWithdrawn=:percentageofWithdrawn where userId=:user_id and id=:transaction_id";
+            Databases::operationsInDB($pdo, $sql, [
+                ":user_id" => $user_id,
+                ":new_value" => $newValueofInvestiment,
+                ":percentageofWithdrawn" => $percentageofWithdrawn,
+                ":transaction_id" => $transaction_id,
+            ]);
+            $newValueofUserAcount = $valueToWithdraw + $user->user_balance;
+            TransactionModel::updateUserBalance(
+                $pdo,
+                $newValueofUserAcount,
+                $user_id
+            );
+            $pdo->commit();
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            return Databases::genericMessage("error", $e->getMessage());
+        }
+
+        return Databases::genericMessage("sucess", "Withdraw made sucessfully");
+
+        // nao permitir que um valor maior que 20% do valor investido seja retirado por withdraw
+
+        // ao fazer suscessivas retiradas de valores, o valor investido deverá "sumir" quando o usuario chegar a retirar 65% do valor
+        // iniciamente depositado no investimento garantido que a API sempre consiga retirar ganhos sobre o investimento
+    }
+    public static function profitInvestiment(stdClass $transactionParams)
+    {
+        // user_id, transaction_id,
+        $transaction_id = $transactionParams->transaction_id;
+        // retorna uma string se nada for encontrado com msg de erro
+        $user_id = $transactionParams->user_id;
+        $userInformation = UserController::getUserInformation($user_id);
+        unset($userInformation->user_balance);
+
+        $transactionInfo = TransactionModel::getTransactionInfo(
+            $transaction_id
+        );
+        if (is_string($transactionInfo)) {
+            return $transactionInfo;
+            exit();
+        }
+
         $depositDate = $transactionInfo->depositDate;
         $depositValue = $transactionInfo->depositValue;
 
@@ -99,10 +191,12 @@ class TransactionModel
         $profit = round(
             $depositValue * pow(1 + $interest, $days) - $depositValue,
             5
-        ); // filtro para impedir que valor chegue ao infinto no PHP
+        );
+        $total = (float) ($profit + $depositValue); // filtro para impedir que valor chegue ao infinto no PHP
         return [
             "transaction_id" => $transaction_id,
             "user" => $userInformation,
+            "totalInvested" => $total,
             "profit" => $profit,
             "depositValue" => $depositValue,
             "interest" => $interest . " per months",
@@ -157,7 +251,7 @@ class TransactionModel
             ":transaction_id" => $transaction_id,
         ]);
         if (!$result) {
-            return Databases::resultsNotFound("Transactions ");
+            return json_encode(Databases::resultsNotFound("Transactions "));
         }
         return $result[0]; // o fetchAll da f consultingDB retorna um array e eu quero capturar apenas o primeiro
     }

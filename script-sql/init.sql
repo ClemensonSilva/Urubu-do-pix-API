@@ -13,6 +13,7 @@ create table if not exists transactions (
     userId int not null,
     depositValue float not null,
     depositDate date not null,
+    percentageWithdrawn float,
     FOREIGN KEY (userId) REFERENCES users (id)
 );
 
