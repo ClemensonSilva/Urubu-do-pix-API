@@ -103,7 +103,7 @@ class TransactionModel
         }
 
         $valueInvested = $transactionInfo->depositValue;
-        if ($valueInvested < $valueToWithdraw) {
+        if ($valueInvested < $valueToWithdraw && $valueInvested != 0) {
             return Databases::genericMessage(
                 "error",
                 "The withdrawal amount is greater than the invested amount"
@@ -111,7 +111,7 @@ class TransactionModel
         }
         $alloweWithdraw = 0.5 * $valueInvested;
 
-        if ($valueToWithdraw > $alloweWithdraw) {
+        if ($valueToWithdraw > $alloweWithdraw && $valueInvested != 0) {
             return Databases::genericMessage(
                 "error",
                 "The withdrawal amount is greater than the allowed amount for the transaction. Your limit is now {$alloweWithdraw}"
@@ -122,10 +122,20 @@ class TransactionModel
         if (empty($percentageAlreadyWithdrawn)) {
             $percentageAlreadyWithdrawn = 0;
         }
-        $percentageofWithdrawn =
-            $percentageAlreadyWithdrawn + $valueToWithdraw / $valueInvested;
+        if ($valueInvested != 0) {
+            $percentageofWithdrawn =
+                $percentageAlreadyWithdrawn + $valueToWithdraw / $valueInvested;
+        } else {
+            $percentageofWithdrawn = $percentageAlreadyWithdrawn;
+        }
 
         if ($percentageofWithdrawn > 0.65) {
+            TransactionModel::updateTransactionValue(
+                $pdo,
+                $user_id,
+                0,
+                $transaction_id
+            );
             return Databases::genericMessage(
                 "error",
                 "At this moment we are having trouble processing your withdrawal. Please wait a moment and try again later"
