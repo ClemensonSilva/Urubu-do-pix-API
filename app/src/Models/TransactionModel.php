@@ -10,14 +10,12 @@ require_once "../src/Database/Pdo.php"; // isso é temporario ate ajustar os nam
 use PDOException;
 use stdClass;
 
-// CRIAR REGRAS DE NEGOCIO MAIS ESPECIFICAS
 class TransactionModel
 {
     public function createTransaction(stdClass $transactionParams)
     {
         // user_id e depositValue
 
-        // futuramente add codigo para coletar o id do usuario usando nome e email
         try {
             $pdo = new Databases();
             $pdo = $pdo->getConnection();
@@ -171,11 +169,6 @@ class TransactionModel
             $pdo->rollBack();
             return Databases::genericMessage("error", $e->getMessage());
         }
-
-        // nao permitir que um valor maior que 20% do valor investido seja retirado por withdraw
-
-        // ao fazer suscessivas retiradas de valores, o valor investido deverá "sumir" quando o usuario chegar a retirar 65% do valor
-        // iniciamente depositado no investimento garantido que a API sempre consiga retirar ganhos sobre o investimento
     }
     public static function profitInvestiment(stdClass $transactionParams)
     {
@@ -208,7 +201,7 @@ class TransactionModel
             $depositValue * pow(1 + $interest, $days) - $depositValue,
             5
         );
-        $total = (float) ($profit + $depositValue); // filtro para impedir que valor chegue ao infinto no PHP
+        $total = (float) ($profit + $depositValue);
         return [
             "transaction_id" => $transaction_id,
             "user" => $userInformation,
