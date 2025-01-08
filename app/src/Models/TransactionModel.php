@@ -22,6 +22,7 @@ class TransactionModel
 
             (int) ($user_id = $transactionParams->user_id);
             (float) ($depositValue = $transactionParams->depositValue);
+            (int) ($investimentTime = $transactionParams->investimentTime);
 
             if (empty($transactionParams->depositDate)) {
                 $depositDate = $transactionParams->depositDate = TransactionModel::setDate();
@@ -35,15 +36,22 @@ class TransactionModel
             $user_balance = UserController::getUserInformation($user_id)
                 ->user_balance;
 
+            $interest = TransactionModel::interestByDay($investimentTime);
+
+            if (is_string($interest)) {
+                return json_decode($interest);
+                exit();
+            }
+
             if (TransactionModel::userhasBalance($user_id, $depositValue)) {
                 $pdo->beginTransaction();
                 TransactionModel::addDepositInvestiment(
                     $pdo,
                     $user_id,
                     $depositDate,
-                    $depositValue
+                    $depositValue,
+                    $investimentTime
                 );
-
                 (float) ($newBalance = $user_balance - $depositValue);
 
                 TransactionModel::updateUserBalance(
@@ -172,10 +180,11 @@ class TransactionModel
     }
     public static function profitInvestiment(stdClass $transactionParams)
     {
-        // user_id, transaction_id,
+        // user_id, transaction_id
         $transaction_id = $transactionParams->transaction_id;
         // retorna uma string se nada for encontrado com msg de erro
         $user_id = $transactionParams->user_id;
+
         $userInformation = UserController::getUserInformation($user_id);
         unset($userInformation->user_balance);
 
@@ -195,11 +204,18 @@ class TransactionModel
         $interval = date_diff($depositDate, $now);
         $days = round($interval->days / 30, 1);
 
-        $interest = 0.33;
+        $interest = TransactionModel::interestByDay(
+            $transactionInfo->investimentTime
+        );
+
+        if (is_string($interest)) {
+            return $interest;
+            exit();
+        }
 
         $profit = round(
             $depositValue * pow(1 + $interest, $days) - $depositValue,
-            5
+            2
         );
         $total = (float) ($profit + $depositValue);
         return [
@@ -211,6 +227,28 @@ class TransactionModel
             "interest" => $interest . " per months",
             "depositDate" => $depositDate,
         ];
+    }
+    public static function interestByDay(int $days)
+    {
+        switch ($days) {
+            case 30:
+                return 0.33;
+                break;
+            case 15:
+                return 0.15;
+                break;
+            case 7:
+                return 0.4;
+                break;
+            default:
+                return json_encode(
+                    Databases::genericMessage(
+                        "error",
+                        "Invalid number of days to invest. You should choose 30, 15 or 7 days to invest."
+                    )
+                );
+                break;
+        }
     }
     public static function updateTransactionValue(
         $pdo,
@@ -244,14 +282,16 @@ class TransactionModel
         PDO $pdo,
         int $user_id,
         $depositDate,
-        float $depositValue
+        float $depositValue,
+        $investimentTime
     ): void {
-        $sql = "INSERT into transactions(userId, depositValue, depositDate)
-                           VALUES(:userId, :depositValue, :depositDate)";
+        $sql = "INSERT into transactions(userId, depositValue, depositDate, investimentTime)
+                           VALUES(:userId, :depositValue, :depositDate, :investimentTime)";
         Databases::operationsInDB($pdo, $sql, [
             ":userId" => $user_id,
             ":depositValue" => $depositValue,
             ":depositDate" => $depositDate,
+            ":investimentTime" => $investimentTime,
         ]);
     }
     public static function updateUserBalance(

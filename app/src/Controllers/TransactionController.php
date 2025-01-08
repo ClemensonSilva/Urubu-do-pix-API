@@ -11,12 +11,13 @@ class TransactionController
     {
         if (
             empty($transactionParams->depositValue) ||
-            empty($transactionParams->user_id)
+            empty($transactionParams->user_id) ||
+            empty($transactionParams->investimentTime)
         ) {
             echo json_encode(
                 Databases::genericMessage(
                     "error",
-                    "The transaction data like depositValue and user id is mandatory."
+                    "The transaction data like depositValue and user id or Investiment time is mandatory."
                 )
             );
             return 0;

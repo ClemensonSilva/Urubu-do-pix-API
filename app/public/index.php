@@ -5,16 +5,19 @@ require_once "/app/routes/routes.php";
 var_dump(method_exists("App\Models\UserModel", "getUsers"));
  */
 
+use App\Controllers\TransactionController;
 use App\Models\TransactionModel;
 use App\Controllers\UserController;
 /*
 
 var_dump(TransactionModel::getTransactionInfo(20));
-$transaction = new stdClass();
-$transaction->user_id = 1;
-$transaction->transaction_id = 2;
-$transaction->valueToWithdraw = 2;
 var_dump(TransactionModel::withdraw($transaction));
+$transaction = new stdClass();
+$transaction->user_id = 8;
+$transaction->depositValue = 20;
+$transaction->investimentTime = 7;
+$a = new TransactionController();
+var_dump($a->createTransaction($transaction));
 */
 
 try {
