@@ -64,7 +64,6 @@ class UserModel
 
         $user_id = $userParams->user_id;
 
-        // consultar DB e verificar as transactions que existem para esse usuario
         $sql = "SELECT * FROM transactions WHERE userId=:user_id";
         $results = Databases::consultingDB($pdo, $sql, [
             ":user_id" => $user_id,
@@ -100,7 +99,7 @@ class UserModel
                 return Databases::resultsNotFound("User");
             }
 
-            $userBalance = $userInfo->user_balance; // no futuro, sera preciso fazer correcao e adicionar um campo email, que seja como dado unico no DB
+            $userBalance = $userInfo->user_balance;
             $newBalance = $userBalance + $userParams->deposit;
 
             $sql =
@@ -129,7 +128,6 @@ class UserModel
                 ":userName" => $userParams,
                 ":userId" => $userParams,
             ]);
-            // recebe os resultados da tabela e os transforma em um array associativo
             if (!empty($result)) {
                 return $result[0]; // a funcao consultingDB retorna um array, mas quero coletar o primeiro e unico objeto contido neste array
             } else {

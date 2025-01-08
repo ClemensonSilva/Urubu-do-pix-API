@@ -55,7 +55,7 @@ class UserController
     }
     public function deposit($depositParams)
     {
-        if (empty($userParams->user_id) || empty($userParams->deposit)) {
+        if (empty($depositParams->user_id) || empty($depositParams->deposit)) {
             echo json_encode(
                 Databases::genericMessage(
                     "error",
