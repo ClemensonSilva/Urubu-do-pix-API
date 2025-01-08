@@ -43,7 +43,6 @@ class TransactionController
         }
         echo json_encode(TransactionModel::withdraw($transactionParams));
     }
-    // criar funcao de sacar lucro dos investimentos e lembrar de pôr nele a regra de negocio
     public static function profitInvestiment($transactionParams)
     {
         if (
@@ -58,7 +57,6 @@ class TransactionController
             );
             return 0;
         }
-        // trata saidas do tipo string e do tipo array
         $result = TransactionModel::profitInvestiment($transactionParams);
         if (is_string($result)) {
             echo $result;
