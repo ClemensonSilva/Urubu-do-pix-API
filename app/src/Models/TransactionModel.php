@@ -3,6 +3,7 @@ namespace App\Models;
 
 use App\Controllers\UserController;
 use App\Database\Databases;
+use DateInterval;
 use PDO;
 use DateTime;
 
@@ -107,8 +108,23 @@ class TransactionModel
                 "Something is wrong... verifie user Id or transaction Id if its corrects."
             );
         }
+        $investimentTime = $transactionInfo->investimentTime;
+        $depositDate = $transactionInfo->depositDate;
+        $days = TransactionModel::gettingDays($depositDate);
 
+        if ($investimentTime > $days) {
+            $depositDate = new DateTime($depositDate);
+            $interval = new DateInterval("P" . $investimentTime . "D");
+            $dateToWithdraw = date_add($depositDate, $interval)->format(
+                "d-m-Y  "
+            );
+            return Databases::genericMessage(
+                "error",
+                "The withdrawal date is set for {$investimentTime} days after the investment date which is  {$dateToWithdraw}"
+            );
+        }
         $valueInvested = $transactionInfo->depositValue;
+
         if ($valueInvested < $valueToWithdraw && $valueInvested != 0) {
             return Databases::genericMessage(
                 "error",
@@ -198,11 +214,7 @@ class TransactionModel
 
         $depositDate = $transactionInfo->depositDate;
         $depositValue = $transactionInfo->depositValue;
-
-        $depositDate = new DateTime($depositDate);
-        $now = new DateTime();
-        $interval = date_diff($depositDate, $now);
-        $days = round($interval->days / 30, 1);
+        $days = TransactionModel::gettingDays($depositDate);
 
         $interest = TransactionModel::interestByDay(
             $transactionInfo->investimentTime
@@ -227,6 +239,13 @@ class TransactionModel
             "interest" => $interest . " per months",
             "depositDate" => $depositDate,
         ];
+    }
+    public static function gettingDays($depositDate)
+    {
+        $depositDate = new DateTime($depositDate);
+        $now = new DateTime();
+        $interval = date_diff($depositDate, $now);
+        return round($interval->days / 30, 1);
     }
     public static function interestByDay(int $days)
     {
