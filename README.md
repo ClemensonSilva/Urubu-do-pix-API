@@ -1,93 +1,192 @@
-# Desafio Perfect-Pay
-
-Implementação do desafio proposto pela empresa Perfect-pay
+# Urubu-do-pix
 
 ## Descrição
+Esta API tem como objetivo simular o funcionamento do golpe que ficou conhecido como Urubu do Pix, sendo utilizada apenas como forma de treinar habilidades de desenvolvimento e organização de código.
 
-Este projeto em forma de desafio consiste em um aplicativo para gerenciamento de vendas. Ele permite ao usuário cadastrar informações de Clientes, Produtos e Vendas feitas em seu negócio.
+## Authentication
+Não é necessária.
 
-## Funcionalidades
+## Pré-requisitos
+Docker instalado em sua máquina
 
-- `CRUD Produtos`: Operações básicas para a tabela produto.
-- `CRUD Clientes`: Operações básicas para a tabela clientes.
-- `CRUD Vendas`: Operações básicas para a tabela vendas. Em breve será colocada algumas validações para garantir a lógica de negócio das vendas.
-- `Autenticação e histórico de opeações`: Em breve irá ser criado uma funcionalidade que permita que vários usuários tenham acesso ao aplicativo e que suas atividades sejam mapeadas e salvas para futuras consultas.
-
-### Pré-requisitos
-- Para rodar esse projeto em sua máquina, você precisar ter instalado:
-
-```
-PHP versão > 8.2
-Composer
-Docker
-```
-
-###  Instalação
-- Rodar os comandos
-
-```
+## Instalação
+Para rodar o projeto, clone este repositório e vá até a pasta onde ele foi clonado e rode os comandos:
+```bash
 docker compose build
 docker compose up
 ```
+Logo em seguida, use algum software de teste de APIs para acessar os endpoints.
 
-e o comando
-```
-docker compose exec php bash
+## API Endpoints
 
-```
-
-para ter acesso ao container php criado.
-
-- Configurar o .env.example e docker-compose.yml mudando para a conexão com db de sua escolha.
-
-- Dentro do container, rode os comandos:
-
-```
-cp .env.example .env
+### Criar usuário
+```http
+POST /create/user
 ```
 
-```
-php artisan key:generate
-```
-
-- Crie as tabelas com migrations:
-
-```
- php artisan migrate
+**Request Body**
+```json
+{
+    "user_name": "Germany Goverment",
+    "user_balance": 2000
+}
 ```
 
-- Criar alguns dados falsos para testes utilizando o comando
-
+**Response**
+```json
+{
+    "sucess": true,
+    "message": "User created corretly"
+}
 ```
-php artisan db:seed
+
+### Listar todos os usuários
+```http
+GET /user
 ```
 
-- Por fim, basta rodar o comando ir até localhost:8088 e usar a aplicação.
-
-##
-
-
-
-## ⚙️ Executando os testes
-
-- Em desenvolvimento...
-
-###  Analise os testes de ponta a ponta
-
-- Como já foi dito, execulte o comando
-
+**Response**
+```json
+{
+    "data": [
+        {
+            "id": 1,
+            "user_name": "German Goverment",
+            "user_balance": 2000
+        }
+    ]
+}
 ```
-php artisan db:seed
+
+### Depósito na conta do usuário
+```http
+POST /deposit
 ```
-para criar alguns dados falsos a fim de testar a aplicação localmente com alguns dados criados pelo Faker PHP.
 
-##  Construído com
+**Request Body**
+```json
+{
+    "user_id": 1,
+    "deposit": 10000
+}
+```
 
-Ferramentas utilizadas no projeto
+**Response**
+```json
+{
+    "sucess": true,
+    "message": "Deposit made successfully"
+}
+```
 
-* [PHP](https://www.php.net/) - Linguagem de programção
-* [MySql](https://www.mysql.com/) - Banco de Dados
-* [Laravel](https://laravel.com/) - O framework web usado
-* [Docker](https://www.docker.com/) - Configuração do ambiente de desenvolvimento
-* [Composer](https://getcomposer.or) - Gerente de Dependências
-* [Faker PHP](https://fakerphp.org/) - Gerador de dados falsos
+### Investimento na plataforma
+```http
+POST /transaction
+```
+
+**Request Body**
+```json
+{
+    "user_id": 1,
+    "depositValue": 100,
+    "investimentTime": 7
+}
+```
+
+**Response**
+```json
+{
+    "sucess": true,
+    "message": "Transaction made sucessfuly"
+}
+```
+
+### Saque da plataforma
+```http
+POST /withdraw
+```
+
+**Request Body**
+```json
+{
+    "user_id": 1,
+    "transaction_id": 1,
+    "valueToWithdraw": 2
+}
+```
+
+**Response**
+```json
+{
+    "sucess": true,
+    "message": "Withdraw made sucessfully"
+}
+```
+
+### Informação de determinado investimento
+```http
+POST /transactionInformation
+```
+
+**Request Body**
+```json
+{
+    "user_id": 1,
+    "transaction_id": 1
+}
+```
+
+**Response**
+```json
+{
+    "transaction_id": 1,
+    "user": {
+        "id": 1,
+        "user_name": "German Goverment"
+    },
+    "totalInvested": 98,
+    "profit": 0,
+    "depositValue": 98,
+    "interest": "0.4 per months",
+    "depositDate": {
+        "date": "2025-01-07 00:00:00.000000",
+        "timezone_type": 3,
+        "timezone": "UTC"
+    }
+}
+```
+
+### Investimentos do usuário na plataforma
+```http
+POST /user/investiments
+```
+
+**Request Body**
+```json
+{
+    "user_id": 1
+}
+```
+
+**Response**
+```json
+{
+    "German Goverment": {
+        "transaction_id": 1,
+        "totalInvested": 98,
+        "profit": 0,
+        "depositValue": 98,
+        "interest": "0.4 per months",
+        "depositDate": {
+            "date": "2025-01-07 00:00:00.000000",
+            "timezone_type": 3,
+            "timezone": "UTC"
+        }
+    }
+}
+```
+
+## Construído com
+- PHP - linguagem de programação
+- MySql - banco de dados
+- Docker - container para desenvolvimento
